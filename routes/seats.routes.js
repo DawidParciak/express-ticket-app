@@ -12,7 +12,12 @@ router.route('/seats/random').get((req, res) => {
 });
 
 router.route('/seats/:id').get((req, res) => {
-  res.json(db.seats.find((seat) => seat.id === +req.params.id));
+  const seat = db.seats.find(seat => seat.id === parseInt(req.params.id));
+  if (!seat) {
+    res.status(404).send('404 Not found...');
+  } else {
+    res.json(seat);
+  }
 });
 
 router.route('/seats').post((req, res) => {

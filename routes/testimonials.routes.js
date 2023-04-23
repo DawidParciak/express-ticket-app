@@ -13,7 +13,12 @@ router.route('/testimonials/random').get((req, res) => {
 });
 
 router.route('/testimonials/:id').get((req, res) => {
-  res.json(db.testimonials.find((e) => e.id === parseInt(req.params.id)));
+  const testimonial = db.testimonials.find(testimonial => testimonial.id === parseInt(req.params.id));
+  if (!testimonial) {
+    res.status(404).send('404 Not found...');
+  } else {
+    res.json(testimonial);
+  }
 });
 
 router.route('/testimonials').post((req, res) => {
