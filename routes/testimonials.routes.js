@@ -14,6 +14,7 @@ router.route('/testimonials/random').get((req, res) => {
 
 router.route('/testimonials/:id').get((req, res) => {
   const testimonial = db.testimonials.find(testimonial => testimonial.id === parseInt(req.params.id));
+  
   if (!testimonial) {
     res.status(404).send('404 Not found...');
   } else {
@@ -39,11 +40,15 @@ router.route('/testimonials/:id').put((req, res) => {
   const {author, text} = req.body;
   const id = +req.params.id;
   const testimonial = db.testimonials.find((testimonial) => testimonial.id === id)
-  
-  testimonial.author = author;
-  testimonial.text = text;
 
-  res.json({ message: 'OK' });
+  if (!testimonial) {
+    res.status(404).send('404 Not found...');
+  } else {
+    testimonial.author = author;
+    testimonial.text = text;
+
+    res.json({ message: 'OK' });
+  }
 });
 
 
@@ -51,8 +56,12 @@ router.route('/testimonials/:id').delete((req, res) => {
   const id = +req.params.id;
   const index = db.testimonials.findIndex((testimonial) => testimonial.id === id)
 
-  db.testimonials.splice(index, 1)
-  res.json({ message: 'OK' });
+  if (index === -1) {
+    res.status(404).send('404 Not found...');
+  } else {
+    db.testimonials.splice(index, 1);
+    res.json({ message: 'OK' });
+  };
 })
 
 module.exports = router;
