@@ -1,67 +1,11 @@
 const express = require('express');
 const router = express.Router();
-const uuid = require('uuid').v4;
-db = require('../db.js');
+const TestimonialController = require('../controllers/testimonials.controller');
 
-router.route('/testimonials').get((req, res) => {
-  res.json(db.testimonials);
-});
-
-router.route('/testimonials/random').get((req, res) => {
-  const randomIndex = Math.floor(Math.random() * (db.testimonials.length));
-  res.json(db.testimonials[randomIndex]);
-});
-
-router.route('/testimonials/:id').get((req, res) => {
-  const testimonial = db.testimonials.find(testimonial => testimonial.id === parseInt(req.params.id));
-  
-  if (!testimonial) {
-    res.status(404).send('404 Not found...');
-  } else {
-    res.json(testimonial);
-  }
-});
-
-router.route('/testimonials').post((req, res) => {
-  const {author, text} = req.body;
-  const id = uuid();
-  const newTestimonial = {
-    id: id,
-    author: author,
-    text: text,
-  };
-
-  db.testimonials.push(newTestimonial);
-
-  res.json({ message: 'OK' });
-});
-
-router.route('/testimonials/:id').put((req, res) => {
-  const {author, text} = req.body;
-  const id = +req.params.id;
-  const testimonial = db.testimonials.find((testimonial) => testimonial.id === id)
-
-  if (!testimonial) {
-    res.status(404).send('404 Not found...');
-  } else {
-    testimonial.author = author;
-    testimonial.text = text;
-
-    res.json({ message: 'OK' });
-  }
-});
-
-
-router.route('/testimonials/:id').delete((req, res) => {
-  const id = +req.params.id;
-  const index = db.testimonials.findIndex((testimonial) => testimonial.id === id)
-
-  if (index === -1) {
-    res.status(404).send('404 Not found...');
-  } else {
-    db.testimonials.splice(index, 1);
-    res.json({ message: 'OK' });
-  };
-})
+router.get('/testimonials', TestimonialController.getAll);
+router.get('/testimonials/:id', TestimonialController.getById);
+router.post('/testimonials', TestimonialController.postNew);
+router.put('/testimonials/:id', TestimonialController.putById);
+router.delete('/testimonials/:id', TestimonialController.deleteById);
 
 module.exports = router;
