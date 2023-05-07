@@ -45,7 +45,9 @@ io.on('connection', (socket) => {
   console.log('new socket!', socket.id);
 });
 
-mongoose.connect('mongodb://localhost:27017/NewWaveDB', { useNewUrlParser: true, useUnifiedTopology: true });
+const uri = "mongodb+srv://dawparc:haslohaslo@newwave.potewil.mongodb.net/NewWaveDB?retryWrites=true&w=majority";
+
+mongoose.connect(uri, { useNewUrlParser: true, useUnifiedTopology: true });
 const db = mongoose.connection;
 
 db.once('open', () => {
