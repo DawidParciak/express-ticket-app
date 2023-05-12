@@ -1,8 +1,22 @@
 const Concert = require('../models/concert.model.js');
+const Seat = require('../models/seat.model.js');
 
 exports.getAll = async (req, res) => {
   try {
-    res.json(await Concert.find());
+    const concerts = await Concert.find();
+    const updatedConcerts = [];
+
+    for (let i = 0; i < concerts.length; i++) {
+      const concert = concerts[i];
+      const reservedSeats = await Seat.countDocuments({ day: concert.day });
+      const availableTickets = 50 - reservedSeats;
+
+      const updatedConcert = concert.toObject();
+      updatedConcert.tickets = availableTickets;
+      updatedConcerts.push(updatedConcert);
+    }
+
+    res.json(updatedConcerts);
   }
   catch(err) {
     res.status(500).json({ message: err });
@@ -62,5 +76,3 @@ exports.deleteById = async (req, res) => {
     res.status(500).json({ message: err });
   }
 };
-
-
