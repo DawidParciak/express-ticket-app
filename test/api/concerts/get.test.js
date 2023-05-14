@@ -77,13 +77,15 @@ describe('GET /api/concerts', () => {
     const res = await request(server).get(`/api/concerts/${concert._id}`);
     expect(res.status).to.be.equal(200);
     expect(res.body).to.be.an('object');
-    expect(res.body).to.not.be.null;
-    expect(res.body._id).to.be.equal(concert._id.toString());
-    expect(res.body.performer).to.be.equal(concert.performer);
-    expect(res.body.genre).to.be.equal(concert.genre);
-    expect(res.body.price).to.be.equal(concert.price);
-    expect(res.body.day).to.be.equal(concert.day);
-    expect(res.body.image).to.be.equal(concert.image);
+    expect(res.body).to.deep.equal({
+      __v: 0,
+      _id: concert._id.toString(),
+      performer: concert.performer,
+      genre: concert.genre,
+      price: concert.price,
+      day: concert.day,
+      image: concert.image
+    });
   });
 
   it('/:id should return a 404 error when given an invalid :id', async () => {
