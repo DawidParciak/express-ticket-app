@@ -10,6 +10,7 @@ const expect = chai.expect;
 const request = chai.request;
 
 describe('GET /api/concerts', () => {
+  let testConcerts;
 
   before(async () => {
     const testConcert1 = new Concert({
@@ -20,7 +21,6 @@ describe('GET /api/concerts', () => {
       day: 1,
       image: 'Image #1'
     });
-    await testConcert1.save();
 
     const testConcert2 = new Concert({
       _id: '645e76980022bad1551aa568',
@@ -30,7 +30,6 @@ describe('GET /api/concerts', () => {
       day: 2,
       image: 'Image #2'
     });
-    await testConcert2.save();
 
     const testConcert3 = new Concert({
       _id: '645e763f0022bad1551aa567',
@@ -40,18 +39,21 @@ describe('GET /api/concerts', () => {
       day: 3,
       image: 'Image #3'
     });
-    await testConcert3.save();
+
+    testConcerts = [testConcert1, testConcert2, testConcert3];
+
+    await Concert.insertMany(testConcerts);
   });
 
   after(async () => {
     await Concert.deleteMany();
-  })
+  });
 
   it('should return all concerts', async () => {
     const res = await request(server).get('/api/concerts');
     expect(res.status).to.be.equal(200);
     expect(res.body).to.be.an('array');
-    expect(res.body.length).to.be.equal(3);
+    expect(res.body.length).to.be.equal(testConcerts.length);
   });
 
   it('should return available tickets for each concert', async () => {
@@ -59,7 +61,7 @@ describe('GET /api/concerts', () => {
 
     expect(res.status).to.be.equal(200);
     expect(res.body).to.be.an('array');
-    expect(res.body.length).to.be.equal(3);
+    expect(res.body.length).to.be.equal(testConcerts.length);
 
     for (let i = 0; i < res.body.length; i++) {
       const concert = res.body[i];
@@ -71,12 +73,17 @@ describe('GET /api/concerts', () => {
   });
 
   it('/:id should return one concert by :id ', async () => {
-    const concertId = '645e76080022bad1551aa566'
-    const res = await request(server).get(`/api/concerts/${concertId}`);
+    const concert = testConcerts[0];
+    const res = await request(server).get(`/api/concerts/${concert._id}`);
     expect(res.status).to.be.equal(200);
     expect(res.body).to.be.an('object');
     expect(res.body).to.not.be.null;
-    expect(res.body._id).to.be.equal(concertId);
+    expect(res.body._id).to.be.equal(concert._id.toString());
+    expect(res.body.performer).to.be.equal(concert.performer);
+    expect(res.body.genre).to.be.equal(concert.genre);
+    expect(res.body.price).to.be.equal(concert.price);
+    expect(res.body.day).to.be.equal(concert.day);
+    expect(res.body.image).to.be.equal(concert.image);
   });
 
   it('/:id should return a 404 error when given an invalid :id', async () => {
